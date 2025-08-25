@@ -19,5 +19,36 @@ public class BookService {
         );
     }
 
+    public Book addBook(Book book) {
+        if (bookRepository.existsByIsbn(book.isbn())) {
+            throw new BookAlreadyExistException(book.isbn());
+        }
+        return bookRepository.save(book);
+    }
+
+    public void deleteBookByIsbn(String isbn) {
+        if (!bookRepository.existsByIsbn(isbn)) {
+            throw new BookNotFoundException(isbn);
+        }
+        bookRepository.deleteByIsbn(isbn);
+    }
+
+    public Book editBook(String isbn, Book book) {
+        if (!bookRepository.existsByIsbn(isbn)) {
+            throw new BookNotFoundException(isbn);
+        }
+
+        return bookRepository.findsByIsbn(isbn).map(existingBook -> {
+            var updateBook = new Book(
+                    isbn,
+                    book.title() != null ? book.title() : existingBook.title(),
+                    book.author() != null ? book.author() : existingBook.author(),
+                    book.price() != 0 ? book.price() : existingBook.price()
+            );
+            return bookRepository.save(updateBook);
+        }).orElseGet(() -> addBook(book));
+
+    }
+
 
 }
