@@ -14,7 +14,7 @@ public record Book(
         String title,
         @NotBlank(message = "Author must not be blank")
         String author,
-        @NotBlank(message = "Price must not be blank")
         @Positive(message = "Price must be greater than zero")
         double price) {
 }
+
